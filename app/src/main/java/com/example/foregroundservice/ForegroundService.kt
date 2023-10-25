@@ -20,6 +20,13 @@ class ForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        println ("Binding for UART and camera")
+        val cameraFragment = CameraFragment()
+        val aiResult = AIResult(this)
+
+        aiResult?.turnThirdPartyAlgorithmAccessSwitch()
+        cameraFragment?.bindCamera(this)
         createNotificationChannel()
     }
 
@@ -46,35 +53,11 @@ class ForegroundService : Service() {
 
         startForeground(1, notification)
 
-        //val activityIntent = Intent(this, MainActivity::class.java)
-        //activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // This flag is necessary to start an activity from a non-activity context.
-        //startActivity(activityIntent)
-
-        //println("Foreground Service has began")
-
-        //cameraFragment = CameraFragment()
-        //val aiResult = AIResult(this)
-
-
-        // Call the turnThirdPartyAlgorithmAccessSwitch function
-        //aiResult?.turnThirdPartyAlgorithmAccessSwitch()
-
-        // Bind the CameraFragment to the service
-        //cameraFragment?.bindCamera(this)
-
-        //val activityIntent = Intent(this, MainActivity::class.java)
-        //activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // This flag is necessary to start an activity from a non-activity context.
-        //startActivity(activityIntent)
+        val activityIntent = Intent(this, MainActivity::class.java)
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // This flag is necessary to start an activity from a non-activity context.
+        startActivity(activityIntent)
 
         return START_NOT_STICKY
-    }
-
-    fun setCameraFragment(fragment: CameraFragment) {
-        this.cameraFragment = fragment
-    }
-
-    fun setAIResult(aiResult: AIResult) {
-        this.aiResult = aiResult
     }
 
     private fun createNotificationChannel() {
