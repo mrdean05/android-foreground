@@ -5,9 +5,6 @@ import org.tensorflow.lite.task.vision.classifier.Classifications
 import kotlin.math.min
 
 class ClassificationResultsAdapter {
-    companion object {
-        private const val NO_VALUE = "--"
-    }
 
     private var categories: MutableList<Category?> = mutableListOf()
     private var adapterSize: Int = 0
