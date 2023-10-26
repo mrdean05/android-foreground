@@ -26,11 +26,13 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
     private val mLock = Any()
 
     private lateinit var imageClassifierHelper: ImageClassifierHelper
+    /*
     private val classificationResultsAdapter by lazy {
         ClassificationResultsAdapter().apply {
             updateAdapterSize(imageClassifierHelper.maxResults)
         }
     }
+    */
 
     private fun initializeImage(context: Context) {
         imageClassifierHelper = ImageClassifierHelper (context = context, imageClassifierListener = this)
@@ -116,7 +118,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onError(error: String) {
-        classificationResultsAdapter.updateResults(null)
+        //classificationResultsAdapter.updateResults(null)
         //classificationResultsAdapter.notifyDataSetChanged()
     }
 
@@ -128,7 +130,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
 
         // Handle classification results here
         if (results != null) {
-            classificationResultsAdapter.updateResults(results)
+            //classificationResultsAdapter.updateResults(results)
             //classificationResultsAdapter.notifyDataSetChanged()
             playSoundsForDetectedCategories(results)
         }
