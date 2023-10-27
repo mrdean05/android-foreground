@@ -53,9 +53,9 @@ class ForegroundService : Service() {
 
         startForeground(1, notification)
 
-        val activityIntent = Intent(this, MainActivity::class.java)
-        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // This flag is necessary to start an activity from a non-activity context.
-        startActivity(activityIntent)
+        //val activityIntent = Intent(this, MainActivity::class.java)
+        //activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // This flag is necessary to start an activity from a non-activity context.
+        //startActivity(activityIntent)
 
         return START_NOT_STICKY
     }

@@ -8,5 +8,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Start the foreground service
+        val serviceIntent = Intent(this, ForegroundService::class.java)
+        startForegroundService(serviceIntent)
     }
+
+
 }
