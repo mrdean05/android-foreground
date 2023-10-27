@@ -9,6 +9,19 @@ import java.io.ByteArrayOutputStream
 class SharedPreferenceManager(private val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
 
+    fun setWidthHeightBitmap(width: Int, height: Int, bitmapBuffer: Bitmap) {
+        val editor = sharedPreferences.edit()
+        editor.putInt("width", width)
+        editor.putInt("height", height)
+
+        // Convert bitmapBuffer to a Base64 string
+
+        val bitmapBufferString = bitmapBuffer.toBase64String()
+
+        editor.putString("bitmapBuffer", bitmapBufferString)
+        editor.apply()
+    }
+
     fun getWidthHeightBitmap(): Triple<Int, Int, Bitmap?> {
         val width = sharedPreferences.getInt("width", 0)
         val height = sharedPreferences.getInt("height", 0)
@@ -31,3 +44,4 @@ class SharedPreferenceManager(private val context: Context) {
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 }
+

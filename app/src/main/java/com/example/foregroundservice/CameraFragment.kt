@@ -24,7 +24,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
     private lateinit var aiResult: AIResult
     private val mLock = Any()
 
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferenceManager
 
     private lateinit var imageClassifierHelper: ImageClassifierHelper
 
@@ -32,7 +32,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
         imageClassifierHelper = ImageClassifierHelper(context = context, imageClassifierListener = this)
         aiResult = AIResult(context = context)
 
-        sharedPreferences = context.getSharedPreferences("ParsePreference", Context.MODE_PRIVATE)
+        sharedPreferences = SharedPreferenceManager(context)
 
     }
 
@@ -67,23 +67,12 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 height,
                 Bitmap.Config.ARGB_8888
             )
-            println("Parse Frame")
 
-            sharedPreferences?.edit()?.apply {
-                putInt("width", width)
-                putInt("height", height)
-                // Convert bitmapBuffer to a byte array and save it as a string
 
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                bitmapBuffer.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                val bitmapByteArray = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
-                putString("bitmapBuffer", bitmapByteArray)
+            sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
 
-                //val bitmapByteArray = Base64.encodeToString(bitmapBuffer.toByteArray(), Base64.DEFAULT)
-                apply()
-            }
 
-            val pixelFormat = frame.info.pixelFormat
+                val pixelFormat = frame.info.pixelFormat
             if (pixelFormat == PixelFormat.YUV420 || pixelFormat == PixelFormat.YV12) {
                 val limit = frame.byteBuffer.limit()
                 val buff = ByteArray(limit)

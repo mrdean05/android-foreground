@@ -67,6 +67,8 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
 
         val sharedPreferenceManager = SharedPreferenceManager(requireContext())
         val (width, height, bitmapBuffer) = sharedPreferenceManager.getWidthHeightBitmap()
+        println("the width is $width, height is $height")
+
 
         imageClassifierHelper =
             context?.let { ImageClassifierHelper (context = it, imageClassifierListener = this) }!!
@@ -85,6 +87,10 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
                     ImageDisplay(width, height,
                         it, fragmentCameraBinding.ivCamera)
                 }
+
+            println("Prinitng the values")
+
+
             runOnUiThread(mImageDisplay)
 
 
