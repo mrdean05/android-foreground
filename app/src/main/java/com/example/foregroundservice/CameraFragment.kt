@@ -67,7 +67,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 height,
                 Bitmap.Config.ARGB_8888
             )
-
+            println("the width is $width, height is $height")
 
             sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
 

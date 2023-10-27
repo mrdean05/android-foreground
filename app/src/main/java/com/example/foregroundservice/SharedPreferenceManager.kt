@@ -23,8 +23,8 @@ class SharedPreferenceManager(private val context: Context) {
     }
 
     fun getWidthHeightBitmap(): Triple<Int, Int, Bitmap?> {
-        val width = sharedPreferences.getInt("width", 0)
-        val height = sharedPreferences.getInt("height", 0)
+        val width = sharedPreferences.getInt("width", 1920)
+        val height = sharedPreferences.getInt("height", 1080)
         val bitmapBufferString = sharedPreferences.getString("bitmapBuffer", null)
         val bitmapBuffer = bitmapBufferString?.fromBase64String()
 

@@ -69,9 +69,14 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
         val (width, height, bitmapBuffer) = sharedPreferenceManager.getWidthHeightBitmap()
         println("the width is $width, height is $height")
 
+        val bitmapBufferAnnex = Bitmap.createBitmap(
+            width,
+            height,
+            Bitmap.Config.ARGB_8888
+        )
 
-        imageClassifierHelper =
-            context?.let { ImageClassifierHelper (context = it, imageClassifierListener = this) }!!
+
+        imageClassifierHelper = ImageClassifierHelper (context = requireContext(), imageClassifierListener = this)
 
 
         with(fragmentCameraBinding.recyclerviewResults) {
@@ -82,11 +87,18 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
         if (_fragmentCameraBinding != null) {
             // bind camera
 
+            /*
             mImageDisplay =
                 bitmapBuffer?.let {
                     ImageDisplay(width, height,
                         it, fragmentCameraBinding.ivCamera)
                 }
+
+             */
+
+            mImageDisplay =
+                ImageDisplay(width, height, bitmapBufferAnnex, fragmentCameraBinding.ivCamera)
+
 
             println("Prinitng the values")
 
