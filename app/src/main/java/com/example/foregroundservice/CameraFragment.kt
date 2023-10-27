@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import android.content.SharedPreferences
+import android.provider.Settings.System
+import android.util.Base64
 import com.segway.robot.sdk.vision.BindStateListener
 import com.segway.robot.sdk.vision.Vision
 import com.segway.robot.sdk.vision.frame.Frame
@@ -17,6 +15,7 @@ import com.segway.robot.sdk.vision.stream.PixelFormat
 import com.segway.robot.sdk.vision.stream.Resolution
 import com.segway.robot.sdk.vision.stream.VisionStreamType
 import org.tensorflow.lite.task.vision.classifier.Classifications
+import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
 class CameraFragment : ImageClassifierHelper.ClassifierListener {
@@ -25,18 +24,16 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
     private lateinit var aiResult: AIResult
     private val mLock = Any()
 
+    private lateinit var sharedPreferences: SharedPreferences
+
     private lateinit var imageClassifierHelper: ImageClassifierHelper
-    /*
-    private val classificationResultsAdapter by lazy {
-        ClassificationResultsAdapter().apply {
-            updateAdapterSize(imageClassifierHelper.maxResults)
-        }
-    }
-    */
 
     private fun initializeImage(context: Context) {
-        imageClassifierHelper = ImageClassifierHelper (context = context, imageClassifierListener = this)
+        imageClassifierHelper = ImageClassifierHelper(context = context, imageClassifierListener = this)
         aiResult = AIResult(context = context)
+
+        sharedPreferences = context.getSharedPreferences("ParsePreference", Context.MODE_PRIVATE)
+
     }
 
     private fun classifyImage(bitmapBuffer: Bitmap) {
@@ -44,7 +41,6 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
     }
 
     fun bindCamera(context: Context) {
-
         initializeImage(context)
         println("Binding camera")
         Vision.getInstance().bindService(context, object : BindStateListener {
@@ -71,21 +67,34 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 height,
                 Bitmap.Config.ARGB_8888
             )
-            //mImageDisplay =  ImageDisplay(width, height, bitmapBuffer, fragmentCameraBinding.ivCamera)
+            println("Parse Frame")
+
+            sharedPreferences?.edit()?.apply {
+                putInt("width", width)
+                putInt("height", height)
+                // Convert bitmapBuffer to a byte array and save it as a string
+
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmapBuffer.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                val bitmapByteArray = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
+                putString("bitmapBuffer", bitmapByteArray)
+
+                //val bitmapByteArray = Base64.encodeToString(bitmapBuffer.toByteArray(), Base64.DEFAULT)
+                apply()
+            }
 
             val pixelFormat = frame.info.pixelFormat
             if (pixelFormat == PixelFormat.YUV420 || pixelFormat == PixelFormat.YV12) {
                 val limit = frame.byteBuffer.limit()
                 val buff = ByteArray(limit)
                 frame.byteBuffer.position(0)
-                frame.byteBuffer[buff]
+                frame.byteBuffer.get(buff)
                 yuv2RGBBitmap(buff, bitmapBuffer, width, height)
                 classifyImage(bitmapBuffer)
             } else {
                 Log.d(TAG, "An unsupported format")
             }
         }
-        //runOnUiThread(mImageDisplay)
     }
 
     private fun yuv2RGBBitmap(data: ByteArray, bitmap: Bitmap, width: Int, height: Int) {
@@ -109,29 +118,19 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
         bitmap.setPixels(rgba, 0, width, 0, 0, width, height)
     }
 
-
-
     companion object {
-
         private const val TAG = "Image Classifier"
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onError(error: String) {
-        //classificationResultsAdapter.updateResults(null)
-        //classificationResultsAdapter.notifyDataSetChanged()
+        // Handle error
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onResults(
-        results: List<Classifications>?,
-        inferenceTime: Long
-    ) {
-
-        // Handle classification results here
+    override fun onResults(results: List<Classifications>?, inferenceTime: Long) {
+        // Handle classification results
         if (results != null) {
-            //classificationResultsAdapter.updateResults(results)
-            //classificationResultsAdapter.notifyDataSetChanged()
             playSoundsForDetectedCategories(results)
         }
     }

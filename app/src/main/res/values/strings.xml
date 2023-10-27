@@ -1,3 +1,51 @@
 <resources>
-    <string name="app_name">Fore Ground Service</string>
+    <string name="app_name">PathPilot</string>
+
+    <string name="alt_bottom_sheet_chevron">Bottom sheet expandable indicator</string>
+
+    <string name="alt_bottom_sheet_max_results_button_minus">Decreasing maximum classified results
+        button</string>
+    <string name="alt_bottom_sheet_max_results_button_plus">Increasing maximum classified results
+        button</string>
+    <string name="alt_bottom_sheet_threshold_button_minus">Decreasing threshold of classified image
+        results button</string>
+    <string name="alt_bottom_sheet_threshold_button_plus">Increasing threshold of classified image
+        results button</string>
+    <string name="alt_bottom_sheet_thread_button_minus">Decrease the number of threads used</string>
+    <string name="alt_bottom_sheet_thread_button_plus">Increase the number of threads used</string>
+
+    <string name="label_interence_time">Inference Time</string>
+    <string name="label_fps">Frames per Second</string>
+    <string name="label_confidence_threshold">Threshold</string>
+    <string name="label_max_results">Max Results</string>
+    <string name="label_threads">Number of Threads</string>
+    <string name="label_delegate">Delegate</string>
+    <string name="label_models">ML Model</string>
+
+    <string-array name="delegate_spinner_titles">
+        <item>CPU</item>
+        <item>GPU</item>
+        <item>NNAPI</item>
+    </string-array>
+
+    <string-array name="models_spinner_titles">
+        <item>MobileNet V1</item>
+        <item>EfficientNet Lite0</item>
+        <item>EfficientNet Lite1</item>
+        <item>EfficientNet Lite2</item>
+    </string-array>
+
+    <string name="moving_label">Moving</string>
+    <string name="stop_moving_label">Stop Moving</string>
+    <string name="activity_label">Activity</string>
+    <string name="sidewalk">sidewalk</string>
+    <string name="garage">garage</string>
+    <string name="crosswalk">crosswalk</string>
+    <string name="street">street</string>
+    <string name="logoLabel">Logo</string>
+    <string name="manual_focus_label">Manual focus</string>
+    <string name="autofocus_label">Autofocus</string>
+    <string name="const_10">10</string>
+    <string name="ok">ok</string>
+    <string name="rotate_label">Rotate by 90 Degree</string>
 </resources>

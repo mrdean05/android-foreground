@@ -1,20 +1,25 @@
 package com.example.foregroundservice
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import com.example.foregroundservice.databinding.FragmentCameraBinding
 import com.example.foregroundservice.databinding.ItemClassificationResultBinding
+import org.tensorflow.lite.task.vision.classifier.Classifications
 
-class VisionFragment : Fragment(R.layout.fragment_camera) {
+class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper.ClassifierListener {
 
     private var _fragmentCameraBinding: FragmentCameraBinding? = null
     private val fragmentCameraBinding
@@ -27,7 +32,10 @@ class VisionFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
+    //private val sharedPreferences = context?.getSharedPreferences("ParsePreference", Context.MODE_PRIVATE)
     private var mImageDisplay: ImageDisplay? = null
+    private lateinit var sharedPreferenceManager: SharedPreferenceManager
+
 
     override fun onDestroyView() {
         Log.d(TAG, "destroying view!!!")
@@ -57,6 +65,12 @@ class VisionFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val sharedPreferenceManager = SharedPreferenceManager(requireContext())
+        val (width, height, bitmapBuffer) = sharedPreferenceManager.getWidthHeightBitmap()
+
+        imageClassifierHelper =
+            context?.let { ImageClassifierHelper (context = it, imageClassifierListener = this) }!!
+
 
         with(fragmentCameraBinding.recyclerviewResults) {
             layoutManager = LinearLayoutManager(requireContext())
@@ -65,7 +79,14 @@ class VisionFragment : Fragment(R.layout.fragment_camera) {
 
         if (_fragmentCameraBinding != null) {
             // bind camera
-            //bindCamera()
+
+            mImageDisplay =
+                bitmapBuffer?.let {
+                    ImageDisplay(width, height,
+                        it, fragmentCameraBinding.ivCamera)
+                }
+            runOnUiThread(mImageDisplay)
+
 
             // Attach listeners to UI control widgets
             initBottomSheetControls()
@@ -179,7 +200,7 @@ class VisionFragment : Fragment(R.layout.fragment_camera) {
         imageClassifierHelper.clearImageClassifier()
     }
 
-    inner class ViewHolder(private val binding: ItemClassificationResultBinding) :
+   /* inner class ViewHolder(private val binding: ItemClassificationResultBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(label: String?, score: Float?) {
@@ -199,7 +220,34 @@ class VisionFragment : Fragment(R.layout.fragment_camera) {
             }
         }
     }
+    */
 
+    @SuppressLint("NotifyDataSetChanged")
+    override fun onError(error: String) {
+        requireActivity().runOnUiThread {
+            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            classificationResultsAdapter.updateResults(null)
+            classificationResultsAdapter.notifyDataSetChanged()
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun onResults(
+        results: List<Classifications>?,
+        inferenceTime: Long
+    ) {
+        if (activity != null) {
+            requireActivity().runOnUiThread {
+                // Show result on bottom sheet
+                classificationResultsAdapter.updateResults(results)
+                classificationResultsAdapter.notifyDataSetChanged()
+                if (_fragmentCameraBinding != null) {
+                    fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
+                        String.format("%d ms", inferenceTime)
+                }
+            }
+        }
+    }
 
 
     companion object {
