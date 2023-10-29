@@ -65,9 +65,14 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /*
         val sharedPreferenceManager = SharedPreferenceManager(requireContext())
         val (width, height, bitmapBuffer) = sharedPreferenceManager.getWidthHeightBitmap()
         println("the width is $width, height is $height")
+        */
+
+        val width = 1920
+        val height = 1080
 
         val bitmapBufferAnnex = Bitmap.createBitmap(
             width,
@@ -75,14 +80,13 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
             Bitmap.Config.ARGB_8888
         )
 
+        //imageClassifierHelper = ImageClassifierHelper (context = requireContext(), imageClassifierListener = this)
 
-        imageClassifierHelper = ImageClassifierHelper (context = requireContext(), imageClassifierListener = this)
 
-
-        with(fragmentCameraBinding.recyclerviewResults) {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = classificationResultsAdapter
-        }
+        //with(fragmentCameraBinding.recyclerviewResults) {
+        //    layoutManager = LinearLayoutManager(requireContext())
+        //    adapter = classificationResultsAdapter
+        //}
 
         if (_fragmentCameraBinding != null) {
             // bind camera
@@ -96,18 +100,20 @@ class VisionFragment : Fragment(R.layout.fragment_camera), ImageClassifierHelper
 
              */
 
-            mImageDisplay =
-                ImageDisplay(width, height, bitmapBufferAnnex, fragmentCameraBinding.ivCamera)
+            //val rgba = sharedPreferenceManager.getRGBA()
+            mImageDisplay = ImageDisplay(width, height, bitmapBufferAnnex, fragmentCameraBinding.ivCamera)
 
+            //if (rgba  != null ) {
+            //    bitmapBufferAnnex.setPixels(rgba, 0, width, 0, 0, width, height )
+            //}
 
-            println("Prinitng the values")
-
+            println("UI/UX updating")
 
             runOnUiThread(mImageDisplay)
 
 
             // Attach listeners to UI control widgets
-            initBottomSheetControls()
+            //initBottomSheetControls()
         }
 
         //aiResult = AIResult(context = requireContext())

@@ -67,7 +67,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 height,
                 Bitmap.Config.ARGB_8888
             )
-            println("the width is $width, height is $height")
+            //println("the width is $width, height is $height")
 
             sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
 
@@ -78,7 +78,10 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 val buff = ByteArray(limit)
                 frame.byteBuffer.position(0)
                 frame.byteBuffer.get(buff)
-                yuv2RGBBitmap(buff, bitmapBuffer, width, height)
+                val rgba = yuv2RGBBitmap(buff, width, height)
+                sharedPreferences.setRGBA(rgba)
+                bitmapBuffer.setPixels(rgba, 0, width, 0, 0, width, height)
+                sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
                 classifyImage(bitmapBuffer)
             } else {
                 Log.d(TAG, "An unsupported format")
@@ -86,7 +89,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
         }
     }
 
-    private fun yuv2RGBBitmap(data: ByteArray, bitmap: Bitmap, width: Int, height: Int) {
+    private fun yuv2RGBBitmap(data: ByteArray, width: Int, height: Int): IntArray {
         val frameSize = width * height
         val rgba = IntArray(frameSize)
         for (i in 0 until height) {
@@ -104,7 +107,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 rgba[i * width + j] = -0x1000000 + (b shl 16) + (g shl 8) + r
             }
         }
-        bitmap.setPixels(rgba, 0, width, 0, 0, width, height)
+        return rgba
     }
 
     companion object {

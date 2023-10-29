@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+import com.google.gson.Gson
 
 class SharedPreferenceManager(private val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
@@ -30,6 +31,23 @@ class SharedPreferenceManager(private val context: Context) {
 
         return Triple(width, height, bitmapBuffer)
     }
+
+    fun setRGBA(rgba: IntArray){
+        val intArrayString = Gson().toJson(rgba)
+        val editor = sharedPreferences.edit()
+        editor.putString("rgbaString", intArrayString)
+        editor.apply()
+    }
+
+    fun getRGBA(): IntArray?{
+        val intArrayString = sharedPreferences.getString("rgbaString", null)
+        return if (intArrayString != null) {
+            Gson().fromJson(intArrayString, IntArray::class.java)
+        } else {
+            null
+        }
+    }
+
 
     // Extension functions for Bitmap to convert to/from Base64 String
     private fun Bitmap.toBase64String(): String {
