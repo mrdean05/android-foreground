@@ -6,10 +6,11 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 import com.google.gson.Gson
+import com.segway.robot.sdk.vision.frame.Frame
 
 class SharedPreferenceManager(private val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
-
+    private val gson = Gson()
     fun setWidthHeightBitmap(width: Int, height: Int, bitmapBuffer: Bitmap) {
         val editor = sharedPreferences.edit()
         editor.putInt("width", width)
@@ -43,6 +44,22 @@ class SharedPreferenceManager(private val context: Context) {
         val intArrayString = sharedPreferences.getString("rgbaString", null)
         return if (intArrayString != null) {
             Gson().fromJson(intArrayString, IntArray::class.java)
+        } else {
+            null
+        }
+    }
+
+    fun setFrame(frame: Frame) {
+        val frameJson = gson.toJson(frame)
+        val editor = sharedPreferences.edit()
+        editor.putString("frame", frameJson)
+        editor.apply()
+    }
+
+    fun getFrame(): Frame? {
+        val frameJson = sharedPreferences.getString("frame", null)
+        return if (frameJson != null) {
+            gson.fromJson(frameJson, Frame::class.java)
         } else {
             null
         }
