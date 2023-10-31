@@ -1,10 +1,15 @@
 package com.example.foregroundservice
 
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.example.foregroundservice.databinding.ItemClassificationResultBinding
 import org.tensorflow.lite.support.label.Category
 import org.tensorflow.lite.task.vision.classifier.Classifications
 import kotlin.math.min
 
-class ClassificationResultsAdapter {
+class ClassificationResultsAdapter :
+    RecyclerView.Adapter<ClassificationResultsAdapter.ViewHolder>(){
     companion object {
         private const val NO_VALUE = "--"
     }
@@ -29,12 +34,31 @@ class ClassificationResultsAdapter {
         adapterSize = size
     }
 
-    fun getCategoryLabelAndScore(position: Int): Pair<String, Float> {
-        val category = categories[position]
-        val label = category?.label ?: "Unknown"
-        val score = category?.score ?: 0f
-        return Pair(label, score)
+    override fun getItemCount(): Int = categories.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemClassificationResultBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ViewHolder(binding)
     }
 
-    fun getItemCount(): Int = categories.size
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        categories[position].let { category ->
+            holder.bind(category?.label, category?.score)
+        }
+    }
+
+    inner class ViewHolder(private val binding: ItemClassificationResultBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(label: String?, score: Float?) {
+            with(binding) {
+                tvLabel.text = label ?: NO_VALUE
+                tvScore.text = if (score != null) String.format("%.2f", score) else NO_VALUE
+            }
+        }
+    }
 }
