@@ -79,10 +79,6 @@ class VisionFragment : Fragment(R.layout.fragment_camera){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //imageClassifierHelper = ImageClassifierHelper (context = requireContext(), imageClassifierListener = this)
-        sharedPreferenceManager = SharedPreferenceManager(requireContext())
-
-
         with(fragmentCameraBinding.recyclerviewResults) {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = classificationResultsAdapter
@@ -101,30 +97,36 @@ class VisionFragment : Fragment(R.layout.fragment_camera){
 
     }
 
-    private fun parseFrame() {
+    private fun parseFrame(frame: Frame) {
 
-        val (width, height, bitmapBufferAnnex) = sharedPreferenceManager.getWidthHeightBitmap()
-        val rgba : IntArray? = sharedPreferenceManager.getRGBA()
         synchronized(mLock) {
+            val resolution = frame.info.resolution
+            val width: Int = Resolution.getWidth(resolution)
+            val height: Int = Resolution.getHeight(resolution)
             val bitmapBuffer = Bitmap.createBitmap(
                 width,
                 height,
                 Bitmap.Config.ARGB_8888
             )
             mImageDisplay = ImageDisplay(width, height, bitmapBuffer, fragmentCameraBinding.ivCamera)
-            bitmapBuffer.setPixels(rgba, 0, width, 0, 0, width, height)
+            val pixelFormat = frame.info.pixelFormat
+            if (pixelFormat == PixelFormat.YUV420 || pixelFormat == PixelFormat.YV12) {
+                val limit = frame.byteBuffer.limit()
+                val buff = ByteArray(limit)
+                frame.byteBuffer.position(0)
+                frame.byteBuffer.get(buff)
+                yuv2RGBBitmap(buff, bitmapBuffer, width, height)
+            } else {
+                Log.d(TAG, "An unsupported format")
+            }
         }
         runOnUiThread(mImageDisplay)
         val results = SharedResults.cachedResults
         val inferenceTime = SharedResults.cacheInferenceTime
 
-        //requireActivity().runOnUiThread{
         runOnUiThread{
-
-            println("The list: $results")
             classificationResultsAdapter.updateResults(results)
             classificationResultsAdapter.notifyDataSetChanged()
-
         }
     }
 
@@ -150,25 +152,18 @@ class VisionFragment : Fragment(R.layout.fragment_camera){
     }
 
     inner class ImageDisplayTimerTask : TimerTask() {
-        //private lateinit var sharedPreferenceManager: SharedPreferenceManager
-        // val sharedPreferenceManager = SharedPreferenceManager(requireContext())
         override fun run() {
             synchronized(mLock) {
-                //var frame: Frame? = null
+                var frame: Frame? = null
                 try {
-                    //frame = Vision.getInstance().getLatestFrame(VisionStreamType.FISH_EYE)
-                    //frame = sharedPreferenceManager.getFrame()
-                    parseFrame()
+                    frame = SharedResults.frame
                 } catch (e: Exception) {
                     Log.e(TAG, "IllegalArgumentException  " + e.message)
                 }
-                /*
                 if (frame != null) {
                     parseFrame(frame)
-                    //.getInstance().returnFrame(frame)
                 }
 
-                 */
             }
         }
     }

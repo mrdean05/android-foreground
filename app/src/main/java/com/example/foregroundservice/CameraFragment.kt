@@ -68,7 +68,7 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 Bitmap.Config.ARGB_8888
             )
             //println("the width is $width, height is $height")
-
+            SharedResults.frame = frame
 
             val pixelFormat = frame.info.pixelFormat
             if (pixelFormat == PixelFormat.YUV420 || pixelFormat == PixelFormat.YV12) {
@@ -77,9 +77,9 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 frame.byteBuffer.position(0)
                 frame.byteBuffer.get(buff)
                 val rgba = yuv2RGBBitmap(buff, width, height)
-                sharedPreferences.setRGBA(rgba)
+                //sharedPreferences.setRGBA(rgba)
                 bitmapBuffer.setPixels(rgba, 0, width, 0, 0, width, height)
-                sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
+                //sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
                 classifyImage(bitmapBuffer)
             } else {
                 Log.d(TAG, "An unsupported format")
