@@ -80,7 +80,6 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
                 sharedPreferences.setRGBA(rgba)
                 bitmapBuffer.setPixels(rgba, 0, width, 0, 0, width, height)
                 sharedPreferences.setWidthHeightBitmap(width, height, bitmapBuffer)
-                sharedPreferences.setFrame(frame)
                 classifyImage(bitmapBuffer)
             } else {
                 Log.d(TAG, "An unsupported format")
@@ -122,6 +121,8 @@ class CameraFragment : ImageClassifierHelper.ClassifierListener {
     override fun onResults(results: List<Classifications>?, inferenceTime: Long) {
         // Handle classification results
         if (results != null) {
+            SharedResults.cachedResults = results
+            SharedResults.cacheInferenceTime = inferenceTime
             playSoundsForDetectedCategories(results)
         }
     }

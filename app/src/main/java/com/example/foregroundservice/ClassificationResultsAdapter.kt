@@ -8,8 +8,8 @@ import org.tensorflow.lite.support.label.Category
 import org.tensorflow.lite.task.vision.classifier.Classifications
 import kotlin.math.min
 
-class ClassificationResultsAdapter : RecyclerView.Adapter<ClassificationResultsAdapter.ViewHolder>(){
-
+class ClassificationResultsAdapter :
+    RecyclerView.Adapter<ClassificationResultsAdapter.ViewHolder>(){
     companion object {
         private const val NO_VALUE = "--"
     }
@@ -33,16 +33,6 @@ class ClassificationResultsAdapter : RecyclerView.Adapter<ClassificationResultsA
     fun updateAdapterSize(size: Int) {
         adapterSize = size
     }
-
-
-    /*
-    fun getCategoryLabelAndScore(position: Int): Pair<String, Float> {
-        val category = categories[position]
-        val label = category?.label ?: "Unknown"
-        val score = category?.score ?: 0f
-        return Pair(label, score)
-    }
-     */
 
     override fun getItemCount(): Int = categories.size
 
